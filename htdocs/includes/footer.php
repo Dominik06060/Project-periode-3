@@ -9,26 +9,25 @@
             <h3>Over ons</h3>
             <ul>
                 <li><a href="/over-ons">Het team</a></li>
-                <li><a href="#">Onze visie</a></li>
-                <li><a href="#">Vacatures</a></li>
+                <li><a href="/over-ons">Onze visie</a></li>
+                <li><a href="/ons-aanbod">Ons aanbod</a></li>
             </ul>
         </div>
         <div class="links">
             <h3>Community</h3>
             <ul>
-                <li><a href="#">Events</a></li>
-                <li><a href="#">Blog</a></li>
-                <li><a href="#">Podcast</a></li>
-                <li><a href="#">Invite a friend</a></li>
+                <li><a href="/over-ons">Events</a></li>
+                <li><a href="/over-ons">Blog</a></li>
+                <li><a href="/over-ons">Podcast</a></li>
+                <li><a href="/register-form">Account aanmaken</a></li>
             </ul>
         </div>
         <div class="links">
-            <h3>Socials</h3>
+            <h3>Contact</h3>
             <ul>
-                <li><a href="#">Discord</a></li>
-                <li><a href="#">Instagram</a></li>
-                <li><a href="#">Twitter</a></li>
-                <li><a href="#">Facebook</a></li>
+                <li><a href="mailto:info@rydr.local">info@rydr.local</a></li>
+                <li><a href="tel:+31101234567">010 123 45 67</a></li>
+                <li><a href="/over-ons">Rotterdam Centraal</a></li>
             </ul>
         </div>
     </div>
@@ -36,13 +35,13 @@
 <div class="legal-footer">
     <div class="legal">
         <div class="copyright">
-            © <?= date("Y") ?> Rydr. All rights reserved
+            &copy; <?= date('Y') ?> Rydr. All rights reserved
         </div>
     </div>
     <div class="legal-links">
         <ul>
-            <li><a href="#">Privacy & Policy</a></li>
-            <li><a href="#">Terms & Condition</a></li>
+            <li><a href="/over-ons">Privacy &amp; Policy</a></li>
+            <li><a href="/over-ons">Terms &amp; Conditions</a></li>
         </ul>
     </div>
 </div>
@@ -57,7 +56,7 @@
         <button class="modal-close">&times;</button>
     </div>
 </div>
-<script src="assets/javascript/main.js"></script>
+<script src="assets/javascript/main.js?v=<?= htmlspecialchars($jsVersion, ENT_QUOTES, 'UTF-8') ?>"></script>
 
 </body>
 </html>

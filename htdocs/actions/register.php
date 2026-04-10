@@ -1,38 +1,49 @@
 <?php
-session_start();
-require "database/connection.php";
 
-$email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
-$password = $_POST["password"];
-$confirm_password = $_POST["confirm-password"];
+require_once __DIR__ . '/../includes/app.php';
+require_once __DIR__ . '/../database/connection.php';
 
-if ($password === $confirm_password) {
-    $check_account = $conn->prepare("SELECT * FROM account WHERE email = :email");
-    $check_account->bindParam(":email", $email);
-    $check_account->execute();
-
-    if ($check_account->rowCount() === 0) {
-        //Extra hoge cost om nog beter te beveiligen
-        $options = ['cost' => 14];
-        $encrypted_password = password_hash($password, PASSWORD_DEFAULT, $options);
-
-        $create_account = $conn->prepare("INSERT INTO account (email, password) VALUES (:email, :password)");
-        $create_account->bindParam(":email", $email);
-        $create_account->bindParam(":password", $encrypted_password);
-        $create_account->execute();
-
-        $_SESSION["success"] = "Registratie is gelukt, log nu in:";
-        header("Location: /login-form");
-        exit();
-    } else {
-        $_SESSION["message"] = "Dit e-mailadres is al in gebruik.";
-        $_SESSION["email"] = htmlspecialchars($email);
-        header("Location: /register-form");
-        exit();
-    }
-} else {
-    $_SESSION["message"] = "Wachtwoorden komen niet overeen.";
-    $_SESSION["email"] = htmlspecialchars($email);
-    header("Location: register-form.php");
-    exit();
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    redirect_to('/register-form');
 }
+
+$email = trim((string)($_POST['email'] ?? ''));
+$password = (string)($_POST['password'] ?? '');
+$confirmPassword = (string)($_POST['confirm-password'] ?? '');
+
+set_old_input(['email' => $email]);
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    set_flash_message('error', 'Vul een geldig e-mailadres in.');
+    redirect_to('/register-form');
+}
+
+if (strlen($password) < 8) {
+    set_flash_message('error', 'Je wachtwoord moet minimaal 8 tekens lang zijn.');
+    redirect_to('/register-form');
+}
+
+if ($password !== $confirmPassword) {
+    set_flash_message('error', 'Wachtwoorden komen niet overeen.');
+    redirect_to('/register-form');
+}
+
+$checkAccount = $conn->prepare('SELECT id FROM account WHERE email = :email LIMIT 1');
+$checkAccount->execute([':email' => $email]);
+
+if ($checkAccount->fetch()) {
+    set_flash_message('error', 'Dit e-mailadres is al in gebruik.');
+    redirect_to('/register-form');
+}
+
+$encryptedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+$createAccount = $conn->prepare('INSERT INTO account (email, password) VALUES (:email, :password)');
+$createAccount->execute([
+    ':email' => $email,
+    ':password' => $encryptedPassword,
+]);
+
+clear_old_input();
+set_flash_message('success', 'Registratie is gelukt. Log nu in met je nieuwe account.');
+redirect_to('/login-form');

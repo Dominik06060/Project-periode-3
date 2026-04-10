@@ -1,24 +1,6 @@
 <?php
 
-/**
- * Dit bestand is een héél belangrijk bestand van je applicatie.
- * Alle websitebezoeken komen eerst binnen via deze index.php.
- * Dit bestand gaat vervolgens kijken voor welke pagina de bezoeker komt.
- *
- * Stel: een bezoeker komt binnen op localhost/rental/auto-huren,
- * dan zoekt dit bestand in de 'pages'-folder het bestand auto-huren.php.
- *
- * Waarom doen we dit?
- *  - We krijgen er mooiere URL’s door (auto-huren in plaats van auto-huren.php).
- *  - We kunnen hier één keer logica schrijven voor “wat als de pagina niet bestaat”.
- *  - (Buiten het niveau van dit project) We kunnen ook hier logica toevoegen
- *    om te controleren of iemand is ingelogd, in plaats van dat per pagina te herhalen.
- *
- * Deze manier van je verzoeken afhandelen heet zogenaamd de 'front-controller pattern' en dit is daar een eenvoudige versie van.
- *
- *  Deze comment mág je verwijderen nadat je het hebt gelezen.
- */
-
+require_once __DIR__ . '/includes/app.php';
 
 $requestUri = $_SERVER['REQUEST_URI'];
 $path = trim(parse_url($requestUri, PHP_URL_PATH), '/');
@@ -35,6 +17,16 @@ if ($path === 'login-handler') {
 
 if ($path === 'register-handler') {
     require_once __DIR__ . '/actions/register.php';
+    exit;
+}
+
+if ($path === 'add-car-handler') {
+    require_once __DIR__ . '/actions/add-car.php';
+    exit;
+}
+
+if ($path === 'rent-car-handler') {
+    require_once __DIR__ . '/actions/rent-car.php';
     exit;
 }
 

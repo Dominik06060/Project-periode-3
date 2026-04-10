@@ -1,14 +1,18 @@
-<?php session_start(); ?>
+<?php require_once __DIR__ . '/app.php'; ?>
+<?php
+$cssVersion = file_exists(__DIR__ . '/../assets/css/main.css') ? (string)filemtime(__DIR__ . '/../assets/css/main.css') : '1';
+$jsVersion = file_exists(__DIR__ . '/../assets/javascript/main.js') ? (string)filemtime(__DIR__ . '/../assets/javascript/main.js') : '1';
+?>
 <!doctype html>
-<html lang="en">
+<html lang="nl">
 <head>
-    <meta charset="ISO-8859-1">
+    <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Rydr</title>
-    <link rel="stylesheet" href="assets/css/main.css">
-    <link rel="icon" type="image/png" href="assets/images/favicon.ico" sizes="32x32">
+    <link rel="stylesheet" href="assets/css/main.css?v=<?= htmlspecialchars($cssVersion, ENT_QUOTES, 'UTF-8') ?>">
+    <link rel="icon" type="image/webp" href="assets/images/favicon.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
@@ -20,30 +24,30 @@
             Rydr.
         </a>
     </div>
-    <form action="">
-        <input type="search" name="" id="" placeholder="Welke auto wilt u huren?">
+    <form action="/ons-aanbod" method="get">
+        <input type="search" name="q" id="site-search" placeholder="Welke auto wilt u huren?" value="<?= htmlspecialchars(trim((string)($_GET['q'] ?? '')), ENT_QUOTES, 'UTF-8') ?>">
         <img src="assets/images/icons/search-normal.svg" alt="" class="search-icon">
     </form>
     <nav>
         <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/ons-aanbod">Ons aanbod</a></li>
-            <li><a href="#">Hulp nodig?</a></li>
+            <li><a href="/over-ons">Over ons</a></li>
         </ul>
     </nav>
     <div class="menu">
-        <?php if(isset($_SESSION['id'])){ ?>
-        <div class="account">
-            <img src="assets/images/profil.png" alt="">
-            <div class="account-dropdown">
-                <ul>
-                    <li><img src="assets/images/icons/setting.svg" alt=""><a href="#">Naar account</a></li>
-                    <li><img src="assets/images/icons/logout.svg" alt=""><a href="/logout">Uitloggen</a></li>
-                </ul>
+        <?php if (is_logged_in()) { ?>
+            <div class="account">
+                <img src="assets/images/Profil.webp" alt="Profiel">
+                <div class="account-dropdown">
+                    <ul>
+                        <li><img src="assets/images/icons/setting.svg" alt=""><a href="/ons-aanbod">Beheer aanbod</a></li>
+                        <li><img src="assets/images/icons/logout.svg" alt=""><a href="/logout">Uitloggen</a></li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <?php }else{ ?>
-            <a href="" class="button-primary">Start met huren</a>
+        <?php } else { ?>
+            <a href="/login-form" class="button-primary js-login-trigger">Start met huren</a>
         <?php } ?>
 
     </div>

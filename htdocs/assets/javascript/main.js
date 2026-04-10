@@ -13,7 +13,7 @@ if (accountImage) {
     });
 }
 
-const startButton = document.querySelector('.button-primary');
+const startButton = document.querySelector('.js-login-trigger');
 if (startButton) {
     startButton.addEventListener('click', function(e) {
         e.preventDefault();
@@ -38,3 +38,19 @@ if (modal) {
         }
     });
 }
+
+const dateInputs = document.querySelectorAll('input[type="date"]');
+dateInputs.forEach(function (input) {
+    const openNativePicker = function () {
+        if (typeof input.showPicker === 'function') {
+            try {
+                input.showPicker();
+            } catch (error) {
+                // Ignore browsers that block showPicker outside trusted contexts.
+            }
+        }
+    };
+
+    input.addEventListener('focus', openNativePicker);
+    input.addEventListener('click', openNativePicker);
+});

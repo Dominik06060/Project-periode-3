@@ -1,64 +1,103 @@
 <?php
-require "includes/header.php";
-require_once "database/connection.php";
+require 'includes/header.php';
+require 'database/connection.php';
 
-$cars = [];
+$popularAutos = [];
+$recommendedAutos = [];
+
 try {
-    $stmt = $conn->query("SELECT idauto, name, typecar, steering, capacity, gasoline, prijs FROM auto ORDER BY name ASC");
-    $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $cars = [];
+    $popularStatement = $conn->query('SELECT idauto, name, typecar, steering, capacity, gasoline, prijs, foto FROM auto ORDER BY idauto ASC LIMIT 4');
+    $popularAutos = $popularStatement->fetchAll();
+
+    $recommendedStatement = $conn->query('SELECT idauto, name, typecar, steering, capacity, gasoline, prijs, foto FROM auto ORDER BY idauto ASC LIMIT 8 OFFSET 4');
+    $recommendedAutos = $recommendedStatement->fetchAll();
+} catch (PDOException $exception) {
+    $popularAutos = [];
+    $recommendedAutos = [];
 }
 ?>
+
 <header>
     <div class="advertorials">
         <div class="advertorial">
-            <h2>Hét platform om een auto te huren</h2>
+            <h2>Het platform om snel een auto te huren</h2>
             <p>Snel en eenvoudig een auto huren. Natuurlijk voor een lage prijs.</p>
-            <a href="#" class="button-primary">Huur nu een auto</a>
-            <img src="assets/images/car-rent-header-image-1.png" alt="">
-            <img src="assets/images/header-circle-background.svg" alt="" class="background-header-element">
+            <a href="/ons-aanbod" class="button-primary">Huur nu een auto</a>
+            <img src="assets/images/car-rent-header-image-1.webp" alt="Sportieve huurauto">
+            <img src="assets/images/header-circle-background.webp" alt="" class="background-header-element">
         </div>
         <div class="advertorial">
             <h2>Wij verhuren ook bedrijfswagens</h2>
-            <p>Voor een vaste lage prijs met prettig voordelen.</p>
-            <a href="#" class="button-primary">Huur een bedrijfswagen</a>
-            <img src="assets/images/car-rent-header-image-2.png" alt="">
-            <img src="assets/images/header-block-background.svg" alt="" class="background-header-element">
+            <p>Voor een vaste lage prijs met prettige voordelen.</p>
+            <a href="/ons-aanbod" class="button-primary">Huur een bedrijfswagen</a>
+            <img src="assets/images/car-rent-header-image-2.webp" alt="Bedrijfswagen">
+            <img src="assets/images/header-block-background.webp" alt="" class="background-header-element">
         </div>
     </div>
 </header>
 
 <main>
-    <h2 class="section-title">Beschikbare auto's</h2>
+    <?php if ($successMessage = get_flash_message('success')) { ?>
+        <div class="success-message"><?= htmlspecialchars($successMessage, ENT_QUOTES, 'UTF-8') ?></div>
+    <?php } ?>
+
+    <h2 class="section-title">Populaire auto's</h2>
     <div class="cars">
-        <?php if (empty($cars)) : ?>
-            <p>Er zijn momenteel geen auto's beschikbaar.</p>
-        <?php else : ?>
-            <?php foreach ($cars as $index => $car) : ?>
-                <?php $imgIndex = $index % 12; ?>
-                <div class="car-details">
-                    <div class="car-brand">
-                        <h3><?= htmlspecialchars((string)$car['name']) ?></h3>
-                        <div class="car-type"><?= htmlspecialchars((string)$car['typecar']) ?></div>
-                    </div>
-                    <img src="assets/images/products/car%20(<?= $imgIndex ?>).svg" alt="<?= htmlspecialchars((string)$car['name']) ?>">
-                    <div class="car-specification">
-                        <span><img src="assets/images/icons/gas-station.svg" alt=""><?= (int)$car['gasoline'] ?>L</span>
-                        <span><img src="assets/images/icons/car.svg" alt=""><?= htmlspecialchars((string)$car['steering']) ?></span>
-                        <span><img src="assets/images/icons/profile-2user.svg" alt=""><?= (int)$car['capacity'] ?> Personen</span>
-                    </div>
-                    <div class="rent-details">
-                        <span><span class="font-weight-bold">€<?= number_format((float)$car['prijs'], 2, ',', '.') ?></span> / dag</span>
-                        <a href="/car-detail?name=<?= urlencode((string)$car['name']) ?>" class="button-primary">Bekijk nu</a>
-                    </div>
+        <?php foreach ($popularAutos as $auto) { ?>
+            <?php $imageSrc = car_image_src($auto['foto'] ?? null); ?>
+            <div class="car-details">
+                <div class="car-brand">
+                    <h3><?= htmlspecialchars((string)$auto['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+                    <div class="car-type"><?= htmlspecialchars((string)$auto['typecar'], ENT_QUOTES, 'UTF-8') ?></div>
                 </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
+                <?php if ($imageSrc !== null) { ?>
+                    <img src="<?= $imageSrc ?>" alt="<?= htmlspecialchars((string)$auto['name'], ENT_QUOTES, 'UTF-8') ?>">
+                <?php } else { ?>
+                    <div class="car-image-empty">Geen databasefoto beschikbaar</div>
+                <?php } ?>
+                <div class="car-specification">
+                    <span><img src="assets/images/icons/gas-station.svg" alt=""><?= (int)$auto['gasoline'] ?>L</span>
+                    <span><img src="assets/images/icons/car.svg" alt=""><?= htmlspecialchars((string)$auto['steering'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <span><img src="assets/images/icons/profile-2user.svg" alt=""><?= (int)$auto['capacity'] ?> personen</span>
+                </div>
+                <div class="rent-details">
+                    <span><span class="font-weight-bold">&euro;<?= number_format((float)$auto['prijs'], 0, ',', '.') ?></span> / dag</span>
+                    <a href="/car-detail?id=<?= (int)$auto['idauto'] ?>" class="button-primary">Bekijk nu</a>
+                </div>
+            </div>
+        <?php } ?>
     </div>
+
+    <h2 class="section-title">Aanbevolen auto's</h2>
+    <div class="cars">
+        <?php foreach ($recommendedAutos as $auto) { ?>
+            <?php $imageSrc = car_image_src($auto['foto'] ?? null); ?>
+            <div class="car-details">
+                <div class="car-brand">
+                    <h3><?= htmlspecialchars((string)$auto['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+                    <div class="car-type"><?= htmlspecialchars((string)$auto['typecar'], ENT_QUOTES, 'UTF-8') ?></div>
+                </div>
+                <?php if ($imageSrc !== null) { ?>
+                    <img src="<?= $imageSrc ?>" alt="<?= htmlspecialchars((string)$auto['name'], ENT_QUOTES, 'UTF-8') ?>">
+                <?php } else { ?>
+                    <div class="car-image-empty">Geen databasefoto beschikbaar</div>
+                <?php } ?>
+                <div class="car-specification">
+                    <span><img src="assets/images/icons/gas-station.svg" alt=""><?= (int)$auto['gasoline'] ?>L</span>
+                    <span><img src="assets/images/icons/car.svg" alt=""><?= htmlspecialchars((string)$auto['steering'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <span><img src="assets/images/icons/profile-2user.svg" alt=""><?= (int)$auto['capacity'] ?> personen</span>
+                </div>
+                <div class="rent-details">
+                    <span><span class="font-weight-bold">&euro;<?= number_format((float)$auto['prijs'], 0, ',', '.') ?></span> / dag</span>
+                    <a href="/car-detail?id=<?= (int)$auto['idauto'] ?>" class="button-primary">Bekijk nu</a>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+
     <div class="show-more">
         <a class="button-primary" href="/ons-aanbod">Toon alle</a>
     </div>
 </main>
 
-<?php require "includes/footer.php" ?>
+<?php require 'includes/footer.php' ?>

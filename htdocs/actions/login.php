@@ -1,14 +1,39 @@
 <?php
-session_start();
-require_once "database/connection.php";
 
-$select_user = $conn->prepare("SELECT * FROM account WHERE email = :email");
-$select_user->bindParam(":email", $_POST['email']);
-$select_user->execute();
-$user = $select_user->fetch(PDO::FETCH_ASSOC);
+require_once __DIR__ . '/../includes/app.php';
+require_once __DIR__ . '/../database/connection.php';
 
-if (password_verify($_POST['password'], $user['password'])) {
-    $_SESSION['id'] = $user['id'];
-    $_SESSION['email'] = $user['email'];
-    header('Location: /');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    redirect_to('/login-form');
 }
+
+$email = trim((string)($_POST['email'] ?? ''));
+$password = (string)($_POST['password'] ?? '');
+
+set_old_input(['email' => $email]);
+
+if ($email === '' || $password === '') {
+    set_flash_message('error', 'Vul je e-mailadres en wachtwoord in.');
+    redirect_to('/login-form');
+}
+
+$selectUser = $conn->prepare('SELECT id, email, password, role FROM account WHERE email = :email LIMIT 1');
+$selectUser->execute([':email' => $email]);
+$user = $selectUser->fetch();
+
+if (!$user || !password_verify($password, (string)$user['password'])) {
+    set_flash_message('error', 'De inloggegevens kloppen niet.');
+    redirect_to('/login-form');
+}
+
+session_regenerate_id(true);
+
+$_SESSION['id'] = (int)$user['id'];
+$_SESSION['email'] = (string)$user['email'];
+$_SESSION['role'] = $user['role'];
+
+clear_old_input();
+set_flash_message('success', 'Je bent ingelogd.');
+
+$intendedUrl = pull_intended_url();
+redirect_to($intendedUrl ?: '/');

@@ -12,11 +12,18 @@
     padding: 1em 2em;
     border-radius: 10px;
   }
+  select{
+    background-color: #F6F7F9;
+    border: none;
+    margin-bottom: 24px;
+    padding: 1em 2em;
+    border-radius: 10px;
+  }
   label{
     margin-bottom: 1em;
   }
-
-  //input[type=submit]{
-  //  max-width: fit-content;
-  //}
+  .form-note{
+    color: #596780;
+    margin: 0;
+  }
 }

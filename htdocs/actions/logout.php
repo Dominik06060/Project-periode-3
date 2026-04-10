@@ -1,4 +1,6 @@
 <?php
-session_start();
+
+require_once __DIR__ . '/../includes/app.php';
+
 session_destroy();
-header("location: /");
+redirect_to('/');
