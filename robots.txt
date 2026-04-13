@@ -1,0 +1,83 @@
+.car-detail{
+
+  .grid{
+    gap: 50px;
+    .car-type .row{
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  .advertorial{
+    position: relative;
+    overflow: hidden;
+  }
+
+  .advertorial > *{
+    position: relative;
+    z-index: 1;
+  }
+
+  .advertorial .background-header-element{
+    z-index: 0;
+  }
+
+  .call-to-action{
+    display: flex;
+    padding-top: 5em;
+    .row{
+      justify-content: left !important;
+      align-items: center;
+    }
+  }
+  .call-to-action .row:last-of-type{
+    display: flex;
+    justify-content: flex-end !important;
+  }
+
+  .rental-panel{
+    margin-top: 2em;
+  }
+
+  .booking-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+
+  .booking-card{
+    padding: 0;
+  }
+
+  .compact-form{
+    margin: 0;
+    padding: 0;
+    max-width: none;
+    background-color: transparent;
+  }
+
+  .compact-form button{
+    border: none;
+  }
+
+  .availability-list{
+    margin: 0;
+    padding-left: 1.2em;
+    color: #596780;
+  }
+
+  .availability-list li + li{
+    margin-top: 0.5em;
+  }
+
+  .booking-note{
+    color: #596780;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 900px){
+  .car-detail .booking-grid{
+    grid-template-columns: 1fr;
+  }
+}
